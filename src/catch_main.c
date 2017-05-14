@@ -2,7 +2,7 @@
 #include "catch.hpp"
 
 #include "mock_interface.h"
-#include "reporter_interface.h"
+/* #include "reporter_interface.h" */
 
 struct MockListener : Catch::TestEventListenerBase {
 
@@ -14,7 +14,7 @@ struct MockListener : Catch::TestEventListenerBase {
     
     virtual void testCaseEnded( Catch::TestCaseStats const& testCaseStats ) override {
         destroy_mocks();
-        pass_reports();
+        /* pass_reports(); */
     }    
 };
 

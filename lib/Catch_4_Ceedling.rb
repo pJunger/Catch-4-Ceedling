@@ -11,9 +11,8 @@ class Catch4_Ceedling < Plugin
 
     GeneratorTestRunner.set_main_location(@plugin_root)
     # Switch out the The unity test runner with the catchy thing.
+    # Yeah, did not work as planned, so plan B: Monkey patching :(
     # @ceedling[:generator_test_runner] = CatchTestRunnerGenerator.new()
-    # @ceedling[:generator_test_runner].find_tests = CatchTestRunnerGenerator.find_tests
-    # @ceedling[:generator_test_runner].generate = CatchTestRunnerGenerator.generate
 
     # Add the path to catch.hpp to the include paths.
     COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@plugin_root}/vendor/Catch/single_include"
