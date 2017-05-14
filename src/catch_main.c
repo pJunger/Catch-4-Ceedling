@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "mock_interface.hpp"
-#include "reporter_interface.hpp"
+#include "mock_interface.h"
+#include "reporter_interface.h"
 
 struct MockListener : Catch::TestEventListenerBase {
 
