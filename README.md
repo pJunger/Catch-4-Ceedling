@@ -23,7 +23,9 @@ CMocks validate method has to be called manually in testcase.
 Alternatively use fff plugin
 
 
-## Todo:
-* Separate Catch main file from generated file for mocks
-* Use proper plugin interfaces instead of monkey patching
-* Create Catch reporter, so that Ceedling will comprehend the output
+## Tasks
+- [x] Overwrite Unity test runner generator
+- [x] Include initialization of generated mocks
+- [ ] Link Catch main file separately to improve compilation speed
+- [ ] Use proper plugin interfaces instead of monkey patching
+- [ ] Create Catch reporter, so that Ceedling will comprehend the output
