@@ -1,4 +1,4 @@
-# Catch-4-Ceedling
+# Catch 4 Ceedling
 Ceedling plugin replacing the integrated Unity framework with Catch
 
 ## Warning: This is a work in progress and does not function (at all!)
