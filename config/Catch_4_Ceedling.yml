@@ -1,0 +1,35 @@
+---
+
+:flags:
+  :test:
+    :compile:
+      :*:
+        - -std=c++17
+        - -Og
+    :linker:
+      :*:
+        - -lstdc++
+
+:tools:
+  :test_compiler:
+    :executable: g++
+    :name: 'GCC Compiler'
+  :test_linker:
+     :executable: g++
+     :name: 'GCC Linker'
+  :test_file_preprocessor:
+    :executable: g++
+    :name: gcc_cpp_test_file_preprocessor
+    :arguments:
+      - -E
+      - -MM
+      - -MG
+      - -std=c++17
+      - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
+      - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
+      - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
+      - -D$: DEFINES_TEST_PREPROCESS
+      - -DGNU_COMPILER
+      - -w
+
+...
