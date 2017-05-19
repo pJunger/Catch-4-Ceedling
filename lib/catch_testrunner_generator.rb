@@ -1,6 +1,7 @@
 require 'fileutils'
 
 
+# Monkey patch the original generator
 class GeneratorTestRunner
   @@main_location
   def initialize(options=nil)
@@ -27,7 +28,7 @@ class GeneratorTestRunner
     # The Main file will not change, as this would take ages to compile
     # FileUtils.copy_file("#{@@main_location}/src/catch_main.cpp", "#{File.dirname(output_file)}/catch_main.c")
 
-    FileUtils.copy_file("#{@@main_location}/src/catch_main.cpp", output_file)
+    FileUtils.copy_file("#{@@main_location}/src/catch_main.c", output_file)
 
     # Create the mock_interface implementation
     File.open(output_file, 'a') do |f|

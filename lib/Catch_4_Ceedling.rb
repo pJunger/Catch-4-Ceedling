@@ -1,5 +1,6 @@
 require 'ceedling/plugin'
 require 'catch_testrunner_generator'
+require 'catch_reporter'
 
 class Catch4_Ceedling < Plugin
 
