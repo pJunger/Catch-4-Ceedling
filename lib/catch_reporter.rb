@@ -50,17 +50,15 @@ class GeneratorTestResults
     if (unity_shell_result[:output] =~ CATCH_STDOUT_STATISTICS_PATTERN)
       results[:counts][:total]   = $1.to_i
       results[:counts][:failed]  = $3.to_i
-      results[:counts][:ignored] = 0
       results[:counts][:passed]  = $2.to_i
 
       results[:countsAsserts][:total]   = $4.to_i
       results[:countsAsserts][:failed]  = $6.to_i
-      results[:countsAsserts][:ignored]  = 0
       results[:countsAsserts][:passed]  = $5.to_i
     end
 
     # remove test statistics lines
-    output_string = unity_shell_result[:output].sub(TEST_STDOUT_STATISTICS_PATTERN, '')
+    output_string = unity_shell_result[:output].sub(CATCH_STDOUT_STATISTICS_PATTERN, '')
     
     output_string.lines do |line|
       # process unity output
@@ -89,6 +87,18 @@ class GeneratorTestResults
     @yaml_wrapper.dump(output_file, results)
     
     return { :result_file => output_file, :result => results }
+  end
+
+  def get_results_structure
+    return {
+      :source         => {:path => '', :file => ''},
+      :successes      => [],
+      :failures       => [],
+      :ignores        => [],
+      :counts         => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
+      :countsAsserts  => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
+      :stdout         => [],
+      }
   end
 end
 
