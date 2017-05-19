@@ -19,7 +19,7 @@
      :name: 'GCC Linker'
   :test_includes_preprocessor:
     :executable: g++
-    :name: gcc_cpp_test_file_preprocessor
+    :name: gcc_cpp_test_includes_preprocessor
     :arguments:
       - -E
       - -MM
@@ -46,15 +46,18 @@
       - -DGNU_COMPILER
       - -w
   :test_dependencies_generator:
-    - -E
-    - -MM
-    - -MG
-    - -std=c++17
-    - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
-    - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
-    - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
-    - -D$: DEFINES_TEST_PREPROCESS
-    - -DGNU_COMPILER
-    - -w
+    :executable: g++
+    :name: gcc_cpp_test_dependencies_generator
+    :arguments:
+      - -E
+      - -MM
+      - -MG
+      - -std=c++17
+      - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
+      - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
+      - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
+      - -D$: DEFINES_TEST_PREPROCESS
+      - -DGNU_COMPILER
+      - -w
 
 ...
