@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_FAST_COMPILE
 #include "catch.hpp"
 
@@ -19,4 +19,32 @@ struct MockListener : Catch::TestEventListenerBase {
     }    
 };
 
+
 CATCH_REGISTER_LISTENER( MockListener )
+
+
+int main( int argc, char* argv[] ) {
+  
+  int result;
+  if (argc < 2) {
+    /* Either no arguments, or it's just the name */
+    
+    /* Add xml reporter to call as that's what we are parsing later on */
+    const char name[] = "test_runner";
+    const char reporter[] = "-r";
+    const char kind[] = "xml";
+
+    const int argc_mod = 3;
+    const char* argv_mod[argc_mod];
+    argv_mod[0] = name;
+    argv_mod[1] = reporter;
+    argv_mod[2] = kind;
+
+    result = Catch::Session().run( argc_mod, argv_mod );
+  } else {
+    /* We called the executable from outside Ceedling */
+    result = Catch::Session().run( argc, argv );
+  }
+
+  return ( result < 0xff ? result : 0xff );
+}
