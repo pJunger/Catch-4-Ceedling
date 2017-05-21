@@ -1,4 +1,6 @@
 # Monkey patch the original
+require 'xml_parser'
+
 class GeneratorHelper
 
     # The only change to the original is the replaced regex match
@@ -10,13 +12,13 @@ class GeneratorHelper
             notice  = "\n" +
                         "ERROR: Test executable \"#{File.basename(executable)}\" failed.\n" +
                         "> Produced no output to $stdout.\n"
-        elsif ((shell_result[:output] =~ CATCH_STDOUT_STATISTICS_PATTERN).nil?)
-            error = true
-            # mirror style of generic tool_executor failure output
-            notice  = "\n" +
-                        "ERROR: Test executable \"#{File.basename(executable)}\" failed.\n" +
-                        "> Produced no final test result counts in $stdout:\n" +
-                        "#{shell_result[:output].strip}\n"
+        # elsif ((shell_result[:output] =~ CATCH_XML_STATISTICS_PATTERN).nil?)
+        #     error = true
+        #     # mirror style of generic tool_executor failure output
+        #     notice  = "\n" +
+        #                 "ERROR: Test executable \"#{File.basename(executable)}\" failed.\n" +
+        #                 "> Produced no final test result counts in $stdout:\n" +
+        #                 "#{shell_result[:output].strip}\n"
         end
     
         if (error)
@@ -37,25 +39,25 @@ end
 
 # Monkey patch the original
 class GeneratorTestResults
-
+  
   def process_and_write_results(unity_shell_result, results_file, test_file)
     output_file   = results_file
-    
+    xml_output = unity_shell_result[:output]
+    catch_xml = Catch.parseXmlResult(xml_output)
+
     results = get_results_structure
-    
+        
     results[:source][:path] = File.dirname(test_file)
     results[:source][:file] = File.basename(test_file)
     
     # process test statistics
-    if (unity_shell_result[:output] =~ CATCH_STDOUT_STATISTICS_PATTERN)
-      results[:counts][:total]   = $1.to_i
-      results[:counts][:failed]  = $3.to_i
-      results[:counts][:passed]  = $2.to_i
+    xml_result = catch_xml.OverallResults
+    # puts xml_result
+    results[:counts][:total]   = xml_result.totals
+    results[:counts][:failed]  = xml_result.failures
+    results[:counts][:passed]  = xml_result.successes
+    results[:counts][:ignored]  = xml_result.expectedFailures
 
-      results[:countsAsserts][:total]   = $4.to_i
-      results[:countsAsserts][:failed]  = $6.to_i
-      results[:countsAsserts][:passed]  = $5.to_i
-    end
 
     # remove test statistics lines
     output_string = unity_shell_result[:output].sub(CATCH_STDOUT_STATISTICS_PATTERN, '')
@@ -102,4 +104,6 @@ class GeneratorTestResults
   end
 end
 
+
+CATCH_XML_STATISTICS_PATTERN = /<OverallResults successes="(\d+)" failures="(\d+)" expectedFailures="(\d+)"\/>/
 CATCH_STDOUT_STATISTICS_PATTERN = /test cases:\s+(\d+)\s+[|]\s+(\d+)\s+passed\s+[|]\s+(\d+)\s+failed\s+assertions:\s+(\d+)\s+[|]\s+(\d+)\s+passed\s+[|]\s+(\d+)\s+failed\s*/i
