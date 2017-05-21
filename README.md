@@ -3,7 +3,7 @@ Ceedling plugin replacing the integrated Unity framework with Catch
 
 ## Warning: This is a work in progress
 * Reporting does not really work!
-* Catch will not register failing mocks!
+* CMock will not work unless Unity Macros are redirected to Catch
 
 ## Preconditions:
 [HappyMapper](https://github.com/dam5s/happymapper) has to be installed
