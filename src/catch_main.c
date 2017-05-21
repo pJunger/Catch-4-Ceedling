@@ -12,11 +12,26 @@ struct MockListener : Catch::TestEventListenerBase {
     virtual void testCaseStarting( Catch::TestCaseInfo const& testInfo ) override {
         init_mocks();
     }
+    virtual void sectionStarting( Catch::SectionInfo const& sectionInfo ) {
+        if (m_sectionStack.size() == 0) {
+          init_mocks();
+        }
+        m_sectionStack.push_back( sectionInfo );
+    }
     
     virtual void testCaseEnded( Catch::TestCaseStats const& testCaseStats ) override {
         destroy_mocks();
         /* pass_reports(); */
     }    
+    virtual void sectionEnded( Catch::SectionStats const& sectionStats ) {
+        m_sectionStack.pop_back();
+        if (m_sectionStack.size() == 0) {
+          destroy_mocks();
+          /* pass_reports(); */
+        }
+    }
+
+    
 };
 
 
