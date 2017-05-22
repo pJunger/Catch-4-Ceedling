@@ -1,4 +1,9 @@
-require 'happymapper'
+begin 
+  require 'happymapper'
+rescue LoadError => e
+  puts 'No HappyMapper found: Please execute "gem install nokogiri-happymapper"' if e.message =~ /happymapper/
+  raise
+end
 
 class OverallResults
     include HappyMapper
