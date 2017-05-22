@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch name="test_runner">
+  <Group name="test_runner">
+    <TestCase name="Blabla" tags="[blub]" filename="test/test_the_source.c" line="9">
+      <Expression success="false" type="REQUIRE" filename="test/test_the_source.c" line="10">
+        <Original>
+          returns_ten() == 1
+        </Original>
+        <Expanded>
+          10 == 1
+        </Expanded>
+      </Expression>
+      <OverallResult success="false"/>
+    </TestCase>
+    <TestCase name="hey, its stupid" tags="[fact]" filename="test/test_the_source.c" line="13">
+      <Section name="Oh, a section" filename="test/test_the_source.c" line="14">
+        <OverallResults successes="1" failures="0" expectedFailures="0"/>
+      </Section>
+      <OverallResult success="true"/>
+    </TestCase>
+    <TestCase name="Scenario: The returns function" tags="[returns]" filename="test/test_the_source.c" line="20">
+      <Section name="Given: The func without input params" filename="test/test_the_source.c" line="21">
+        <Section name="When: returns_ten() is called" filename="test/test_the_source.c" line="22">
+          <Section name="Then: 10 is returned" filename="test/test_the_source.c" line="25">
+            <Expression success="false" type="REQUIRE" filename="test/test_the_source.c" line="26">
+              <Original>
+                actual == 0
+              </Original>
+              <Expanded>
+                10 == 0
+              </Expanded>
+            </Expression>
+            <OverallResults successes="0" failures="1" expectedFailures="0"/>
+          </Section>
+          <OverallResults successes="0" failures="1" expectedFailures="0"/>
+        </Section>
+        <OverallResults successes="0" failures="1" expectedFailures="0"/>
+      </Section>
+      <Section name="Given: The func without input params" filename="test/test_the_source.c" line="21">
+        <Section name="When: returns_ten() is called" filename="test/test_the_source.c" line="22">
+          </OverallResults successes="0" failures="0" expectedFailures="0"/>
+        </Section>
+        <OverallResults successes="0" failures="0" expectedFailures="0"/>
+      </Section>
+      <Section name="Given: The func without input params" filename="test/test_the_source.c" line="31">
+        <Section name="When: returns_ten() is called" filename="test/test_the_source.c" line="32">
+          <Section name="Then: 10 is returned" filename="test/test_the_source.c" line="35">
+            <OverallResults successes="1" failures="0" expectedFailures="0"/>
+          </Section>
+          <OverallResults successes="1" failures="0" expectedFailures="0"/>
+        </Section>
+        <OverallResults successes="1" failures="0" expectedFailures="0"/>
+      </Section>
+      <OverallResult success="false"/>
+    </TestCase>
+    <OverallResults successes="2" failures="2" expectedFailures="0"/>
+  </Group>
+  <OverallResults successes="2" failures="2" expectedFailures="7"/>
+</Catch>
