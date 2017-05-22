@@ -9,21 +9,21 @@ struct MockListener : Catch::TestEventListenerBase {
 
     using TestEventListenerBase::TestEventListenerBase; // inherit constructor
 
-    virtual void testCaseStarting( Catch::TestCaseInfo const& testInfo ) override {
+    virtual void testCaseStarting(Catch::TestCaseInfo const&) override {
         init_mocks();
     }
-    virtual void sectionStarting( Catch::SectionInfo const& sectionInfo ) {
+    virtual void sectionStarting(Catch::SectionInfo const& sectionInfo) {
         if (m_sectionStack.size() == 0) {
           init_mocks();
         }
         m_sectionStack.push_back( sectionInfo );
     }
     
-    virtual void testCaseEnded( Catch::TestCaseStats const& testCaseStats ) override {
+    virtual void testCaseEnded(Catch::TestCaseStats const&) override {
         destroy_mocks();
         /* pass_reports(); */
     }    
-    virtual void sectionEnded( Catch::SectionStats const& sectionStats ) {
+    virtual void sectionEnded(Catch::SectionStats const& sectionStats) {
         m_sectionStack.pop_back();
         if (m_sectionStack.size() == 0) {
           destroy_mocks();
