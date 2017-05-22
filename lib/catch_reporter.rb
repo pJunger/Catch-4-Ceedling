@@ -82,7 +82,7 @@ class GeneratorTestResults
       end
     end
     
-    @generator_test_results_sanity_checker.verify(results, unity_shell_result[:exit_code])
+    # @generator_test_results_sanity_checker.verify(results, unity_shell_result[:exit_code])
     
     output_file = results_file.ext(@configurator.extension_testfail) if (results[:counts][:failed] > 0)
     
