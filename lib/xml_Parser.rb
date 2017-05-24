@@ -10,6 +10,10 @@ class OverallResults
 
     tag 'OverallResults'
 
+    def to_s
+        "OverallResults: +#{@successes} -#{@failures} o#{@expectedFailures}"
+    end
+
     def totals
         @successes + @failures + @expectedFailures
     end
@@ -21,6 +25,10 @@ end
 
 class Expression
     include HappyMapper
+
+    def to_s
+        "#{@tag}: #{@success}"
+    end
 
     tag 'Expression'
     attribute :success, Boolean
@@ -35,6 +43,10 @@ end
 class Section
     include HappyMapper
 
+    def to_s
+        "#{@tag}: #{@name}"
+    end
+
     tag 'Section'
     attribute :name, String
     attribute :filename, String
@@ -48,12 +60,20 @@ end
 class OverallResult
     include HappyMapper
 
+    def to_s
+        "OverallResult: #{@success}"
+    end
+
     tag 'OverallResult'
     attribute :success, Boolean
 end
 
 class TestCase
     include HappyMapper
+
+    def to_s
+        "#{@tag}: #{@name}"
+    end
 
     tag 'TestCase'
     attribute :name, String
@@ -69,6 +89,10 @@ end
 class Group
     include HappyMapper
 
+    def to_s
+        "#{@tag}: #{@name}"
+    end
+
     tag 'Group'
     attribute :name, String
 
@@ -80,6 +104,10 @@ end
 
 class Catch
     include HappyMapper
+
+    def to_s
+        "#{@tag}: #{@name}"
+    end
 
     tag 'Catch'
     attribute :name, String
