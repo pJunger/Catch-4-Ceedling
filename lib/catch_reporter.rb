@@ -77,17 +77,21 @@ class GeneratorTestResults
           # Well, here we really don't have any substantial information
           result = test_case.OverallResult
           if result == true
-            results[:successes] << 1
+            results[:successes] << create_line_elements(test_case)
           else
-            results[:failures]  << 1
+            results[:failures]  << create_line_elements(test_case)
           end
           results[:stdout]    << result.to_s
         else
           sections.each do |section|
             result = section.OverallResults
-            results[:successes] << result.successes
-            results[:failures]  << result.failures
-            results[:ignores]   << result.expectedFailures
+            if (result.successes == 0 and result.failures == 0)
+              results[:ignores]   << create_line_elements(test_case, section)
+            elsif (result.successes == 0)
+              results[:failures]   << create_line_elements(test_case, section)
+            else
+              results[:successes]   << create_line_elements(test_case, section)
+            end
             results[:stdout]    << result.to_s
           end
         end
@@ -104,6 +108,20 @@ class GeneratorTestResults
     return { :result_file => output_file, :result => results }
   end
 
+  def create_line_elements(test_case, section=nil)
+    name = test_case.name
+    if (section.nil?)
+      line = test_case.line
+      message = test_case.to_xml
+    else
+      name += "::#{section.name}"
+      line = section.line
+      message = section.to_xml
+    end
+
+    {:test => name, :line => line.to_i, :message => message}
+  end
+
   def get_results_structure
     return {
       :source         => {:path => '', :file => ''},
@@ -117,6 +135,7 @@ class GeneratorTestResults
   end
 
   private
+
 
   def check_if_catch_successful(output)
     match = output.match(/[\s\S]*?error:\s+TEST_CASE\(\s*"(.*?)"\s*\)\s+already\s+defined.
