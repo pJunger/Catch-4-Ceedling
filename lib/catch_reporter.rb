@@ -40,9 +40,16 @@ end
 # Monkey patch the original
 class GeneratorTestResults
   
+  
+
+
+
   def process_and_write_results(unity_shell_result, results_file, test_file)
     output_file   = results_file
     xml_output = unity_shell_result[:output]
+
+    check_if_catch_successful(xml_output)
+
     catch_xml = Catch.parseXmlResult(xml_output)
 
     results = get_results_structure
@@ -62,26 +69,32 @@ class GeneratorTestResults
     # remove test statistics lines
     output_string = unity_shell_result[:output].sub(CATCH_STDOUT_STATISTICS_PATTERN, '')
     
-    output_string.lines do |line|
-      # process unity output
-      case line
-      when /(:IGNORE)/
-        elements = extract_line_elements(line, results[:source][:file])
-        results[:ignores]   << elements[0]
-        results[:stdout]    << elements[1] if (!elements[1].nil?)
-      when /(:PASS$)/
-        elements = extract_line_elements(line, results[:source][:file])
-        results[:successes] << elements[0]
-        results[:stdout]    << elements[1] if (!elements[1].nil?)
-      when /(:FAIL)/
-        elements = extract_line_elements(line, results[:source][:file])
-        results[:failures]  << elements[0]
-        results[:stdout]    << elements[1] if (!elements[1].nil?)
-      else # collect up all other
-        results[:stdout] << line.chomp
+    catch_xml.Groups.each do |group|
+      group.TestCases.each do |test_case|
+        should_it_fail = test_case.tags =~ /\[!shouldfail\]/
+        sections = test_case.Sections
+        if sections.length == 0
+          # Well, here we really don't have any substantial information
+          result = test_case.OverallResult
+          if result == true
+            results[:successes] << 1
+          else
+            results[:failures]  << 1
+          end
+          results[:stdout]    << result.to_s
+        else
+          sections.each do |section|
+            result = section.OverallResults
+            results[:successes] << result.successes
+            results[:failures]  << result.failures
+            results[:ignores]   << result.expectedFailures
+            results[:stdout]    << result.to_s
+          end
+        end
       end
     end
-    
+
+        
     # @generator_test_results_sanity_checker.verify(results, unity_shell_result[:exit_code])
     
     output_file = results_file.ext(@configurator.extension_testfail) if (results[:counts][:failed] > 0)
@@ -98,10 +111,29 @@ class GeneratorTestResults
       :failures       => [],
       :ignores        => [],
       :counts         => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
-      :countsAsserts  => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
+      # :countsAsserts  => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
       :stdout         => [],
       }
   end
+
+  private
+
+  def check_if_catch_successful(output)
+    match = output.match(/[\s\S]*?error:\s+TEST_CASE\(\s*"(.*?)"\s*\)\s+already\s+defined.
+      \s+First\s+seen\s+at\s+([\w.\/]+):(\d+)
+      \s+Redefined\s+at\s+([\w.\/]+):(\d+)/x)
+
+    if (match)
+      notice = "\nFATAL ERROR:\n"
+      notice += %Q(One or more testcases have already been defined with the same name: "#{match[1]}"\n)
+      notice += "Location #1: #{match[2]} @ line #{match[3]}\n"
+      notice += "Location #2: #{match[4]} @ line #{match[5]}\n\n"
+      # @ceedling[:streaminator].stderr_puts(notice, Verbosity::COMPLAIN)
+      # @streaminator.stderr_puts(notice, Verbosity::COMPLAIN)
+      raise notice
+    end
+  end
+
 end
 
 
