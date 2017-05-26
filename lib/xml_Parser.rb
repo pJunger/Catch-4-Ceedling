@@ -23,7 +23,7 @@ class OverallResults
     attribute :expectedFailures, Integer
 
     def make_report(indent=0)
-        acc = [do_indent("Successes: #{@successes}, Failures: #{@failures}, Ignores: #{@expectedFailures}", indent)]
+        acc = [do_indent("Results: #{@successes} passed, #{@failures} failed, #{@expectedFailures} ignored", indent)]
         acc
     end
 end
@@ -51,10 +51,11 @@ class Expression
     
     def make_report(indent=0)
         next_indent = get_next_indent(indent)
+        next_indent2 = get_next_indent(next_indent)
         acc = [
-            do_indent('Assertion:', indent),
-            get_attribute_s('Original', @Original, next_indent), 
-            get_attribute_s('Expanded', @Expanded, next_indent)
+            do_indent("@ line #{@line}:", next_indent),
+            get_attribute_s('Original', @Original, next_indent2), 
+            get_attribute_s('Expanded', @Expanded, next_indent2)
         ]
         acc
     end
@@ -72,17 +73,24 @@ class Section
     attribute :filename, String
     attribute :line, Integer
 
-    has_many :Sections, ::Section, :tag => 'Section'
-    has_many :Expressions, Expression, :tag => 'Expression', :xpath => '.'
+    has_many :Sections, ::Section, :tag => 'Section', :xpath => '.'
+    has_many :Expressions, Expression, :tag => 'Expression' #, :xpath => '.'
     has_one :OverallResults, OverallResults, :xpath => '.'
 
     def make_report(indent=0, skipResult=false)
         next_indent = get_next_indent(indent)
         acc = [do_indent(name, indent)]
-        acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
+        # acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
         acc += @Sections.flat_map {|section| section.make_report(indent, true)}
         unless skipResult
-            acc += @OverallResults.make_report(next_indent)
+            if @Expressions.empty?
+                acc += ['', do_indent('Results: No Assertions in testcase', indent)]
+            else
+                acc += ['', do_indent('Assertions:', next_indent)]
+                # acc.push(do_indent('Assertions:', next_indent))
+                acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
+                acc += @OverallResults.make_report(indent)
+            end
         end
         acc
     end
@@ -92,14 +100,22 @@ class OverallResult
     include HappyMapper
 
     def to_s
-        "OverallResult: #{@success}"
+        "OverallResult: #{to_passed_failed}"
     end
 
     tag 'OverallResult'
     attribute :success, Boolean
 
+    def to_passed_failed
+        if (@success)
+            'passed'
+        else
+            'failed'
+        end
+    end
+
     def make_report(indent=0)
-        acc = [do_indent("Result: #{@success}", indent)]
+        acc = [do_indent("Result: #{to_passed_failed}", indent)]
         acc
     end
 end
@@ -126,6 +142,7 @@ class TestCase
         # acc = [do_indent(name, indent)]
         acc = []
         acc += @Sections.flat_map {|section| section.make_report(next_indent, true)}
+        acc += ['', do_indent('Assertions:', next_indent)]
         acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
         acc += @OverallResult.make_report(next_indent)
         acc

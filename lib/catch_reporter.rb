@@ -117,7 +117,7 @@ class GeneratorTestResults
       line = test_case.line
       message = test_case
     else
-      name += ", Section ##{index}"
+      name += ", Path ##{index + 1}"
       line = section.line
       message = section
     end
