@@ -9,21 +9,21 @@ struct MockListener : Catch::TestEventListenerBase {
 
     using TestEventListenerBase::TestEventListenerBase; // inherit constructor
 
-    virtual void testCaseStarting( Catch::TestCaseInfo const& testInfo ) override {
+    virtual void testCaseStarting(Catch::TestCaseInfo const&) override {
         init_mocks();
     }
-    virtual void sectionStarting( Catch::SectionInfo const& sectionInfo ) {
+    virtual void sectionStarting(Catch::SectionInfo const& sectionInfo) {
         if (m_sectionStack.size() == 0) {
           init_mocks();
         }
         m_sectionStack.push_back( sectionInfo );
     }
     
-    virtual void testCaseEnded( Catch::TestCaseStats const& testCaseStats ) override {
+    virtual void testCaseEnded(Catch::TestCaseStats const&) override {
         destroy_mocks();
         /* pass_reports(); */
     }    
-    virtual void sectionEnded( Catch::SectionStats const& sectionStats ) {
+    virtual void sectionEnded(Catch::SectionStats const& sectionStats) {
         m_sectionStack.pop_back();
         if (m_sectionStack.size() == 0) {
           destroy_mocks();
@@ -48,12 +48,14 @@ int main( int argc, char* argv[] ) {
     const char name[] = "test_runner";
     const char reporter[] = "-r";
     const char kind[] = "xml";
+    const char all_output[] = "-s";
 
-    const int argc_mod = 3;
+    const int argc_mod = 4;
     const char* argv_mod[argc_mod];
     argv_mod[0] = name;
     argv_mod[1] = reporter;
     argv_mod[2] = kind;
+    argv_mod[3] = all_output;
 
     result = Catch::Session().run( argc_mod, argv_mod );
   } else {
