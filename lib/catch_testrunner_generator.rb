@@ -3,13 +3,9 @@ require 'fileutils'
 
 # Monkey patch the original generator
 class GeneratorTestRunner
-  @@main_location
+  
   def initialize(options=nil)
     
-  end
-
-  def self.set_main_location(f_name)
-    @@main_location = f_name
   end
 
   def run(input_file, output_file, options = nil)
@@ -23,12 +19,6 @@ class GeneratorTestRunner
 
   def generate(input_file, output_file, tests, used_mocks, testfile_includes)
     # We do not need: input_file, tests, testfile_includes
-
-    # Optimization: Create extra catch_main file to reduce compilation times
-    # The Main file will not change, as this would take ages to compile
-    # FileUtils.copy_file("#{@@main_location}/src/catch_main.cpp", "#{File.dirname(output_file)}/catch_main.c")
-
-    FileUtils.copy_file("#{@@main_location}/src/catch_main.c", output_file)
 
     # Create the mock_interface implementation
     File.open(output_file, 'a') do |f|
