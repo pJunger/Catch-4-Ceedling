@@ -32,11 +32,8 @@ class Catch4_Ceedling < Plugin
     # Optimization: Create extra catch_main file to reduce compilation times
     # Compile only once, it should be invariant
     # (Otherwise it would take ages to compile)
-    unless File.exists?(@@main_dir)
-      FileUtils::mkdir_p(@@main_dir)
-    end
-
     unless File.file?(@@main_location)
+      FileUtils::mkdir_p(@@main_dir)
       FileUtils.copy_file("#{@@plugin_root}/src/catch_main.cpp", @@main_location)
     end
   end

@@ -11,8 +11,8 @@
         - -lstdc++
 
 :paths:
-  :include:
-    - #{"#{PROJECT_ROOT}/build/test/main"}
+  :support:
+    - build/test/main
 
 :tools:
   :test_compiler:
