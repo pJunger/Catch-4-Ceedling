@@ -21,6 +21,11 @@ class OverallResults
     attribute :successes, Integer
     attribute :failures, Integer
     attribute :expectedFailures, Integer
+
+    def make_report(indent=0)
+        acc = [do_indent("Successes: #{@successes}, Failures: #{@failures}, Ignores: #{@expectedFailures}", indent)]
+        acc
+    end
 end
 
 class Expression
@@ -38,6 +43,21 @@ class Expression
 
     has_one :Original, String
     has_one :Expanded, String
+
+    def get_attribute_s(attribute_name, attribute, indent)
+        attribute_s = attribute.sub(/^\s*/, '').sub(/\s*$/, '')
+        do_indent("#{attribute_name}: #{attribute_s}", indent)
+    end
+    
+    def make_report(indent=0)
+        next_indent = get_next_indent(indent)
+        acc = [
+            do_indent('Assertion:', indent),
+            get_attribute_s('Original', @Original, next_indent), 
+            get_attribute_s('Expanded', @Expanded, next_indent)
+        ]
+        acc
+    end
 end
 
 class Section
@@ -55,6 +75,17 @@ class Section
     has_many :Sections, ::Section, :tag => 'Section'
     has_many :Expressions, Expression, :tag => 'Expression', :xpath => '.'
     has_one :OverallResults, OverallResults, :xpath => '.'
+
+    def make_report(indent=0, skipResult=false)
+        next_indent = get_next_indent(indent)
+        acc = [do_indent(name, indent)]
+        acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
+        acc += @Sections.flat_map {|section| section.make_report(indent, true)}
+        unless skipResult
+            acc += @OverallResults.make_report(next_indent)
+        end
+        acc
+    end
 end
 
 class OverallResult
@@ -66,6 +97,11 @@ class OverallResult
 
     tag 'OverallResult'
     attribute :success, Boolean
+
+    def make_report(indent=0)
+        acc = [do_indent("Result: #{@success}", indent)]
+        acc
+    end
 end
 
 class TestCase
@@ -82,7 +118,18 @@ class TestCase
     attribute :line, Integer
 
     has_many :Sections, Section, :tag => 'Section', :xpath => '.'
+    has_many :Expressions, Expression, :tag => 'Expression', :xpath => '.'
     has_one :OverallResult, OverallResult, :xpath => '.'
+
+    def make_report(indent=0)
+        next_indent = get_next_indent(indent)
+        # acc = [do_indent(name, indent)]
+        acc = []
+        acc += @Sections.flat_map {|section| section.make_report(next_indent, true)}
+        acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
+        acc += @OverallResult.make_report(next_indent)
+        acc
+    end
 end
 
 
@@ -98,6 +145,14 @@ class Group
 
     has_many :TestCases, TestCase, :tag => 'TestCase', :xpath => '.'
     has_one :OverallResults, OverallResults, :xpath => '.'
+
+    def make_report(indent=0)
+        next_indent = get_next_indent(indent)
+        acc = [do_indent(name, indent)]
+        acc += @TestCases.flat_map {|test_case| test_case.make_report(next_indent)}
+        acc += @OverallResults.make_report(next_indent)
+        acc
+    end
 end
 
 
@@ -115,8 +170,27 @@ class Catch
     has_many :Groups, Group, :tag => 'Group', :xpath => '.'
     has_one :OverallResults, OverallResults, :xpath => '.'
 
+    def make_report(indent=0)
+        next_indent = get_next_indent(indent)
+        acc = [do_indent(name, indent)]
+        acc += @Groups.flat_map {|group| group.make_report(next_indent)}
+        acc += @OverallResults.make_report(next_indent)
+        acc
+    end
 
     def self.parseXmlResult(data)
         Catch.parse(data, :single => true)
     end
+end
+
+def get_next_indent(cur_indent)
+    cur_indent + 2
+end
+
+def do_indent(item, indent)
+    (' ' * indent) + item
+end
+
+def make_report(xml_node, indent)
+    "\n" + xml_node.make_report(2).join("\n")
 end

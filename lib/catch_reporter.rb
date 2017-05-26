@@ -76,24 +76,27 @@ class GeneratorTestResults
         if sections.length == 0
           # Well, here we really don't have any substantial information
           result = test_case.OverallResult
-          if result == true
+          if result.success == true
             results[:successes] << create_line_elements(test_case)
           else
             results[:failures]  << create_line_elements(test_case)
           end
-          results[:stdout]    << result.to_s
         else
-          sections.each do |section|
+          sections.each_with_index do |section, index|
             result = section.OverallResults
-            if (result.successes == 0 and result.failures == 0)
-              results[:ignores]   << create_line_elements(test_case, section)
-            elsif (result.successes == 0)
-              results[:failures]   << create_line_elements(test_case, section)
+            line_elem = create_line_elements(test_case, section, index)
+            if (result.successes == 0 and result.failures == 0 and result.expectedFailures == 0)
+              # No assertions?
+              results[:failures]   << line_elem
+            elsif (result.successes == 0 and result.failures == 0)
+              results[:ignores]   << line_elem
+            elsif (result.failures > 0)
+              results[:failures]   << line_elem
             else
-              results[:successes]   << create_line_elements(test_case, section)
+              results[:successes]   << line_elem
             end
-            results[:stdout]    << result.to_s
           end
+          results[:stdout]    << make_report(result, 0)
         end
       end
     end
@@ -108,18 +111,18 @@ class GeneratorTestResults
     return { :result_file => output_file, :result => results }
   end
 
-  def create_line_elements(test_case, section=nil)
+  def create_line_elements(test_case, section=nil, index=nil)
     name = test_case.name
     if (section.nil?)
       line = test_case.line
-      message = test_case.to_xml
+      message = test_case
     else
-      name += "::#{section.name}"
+      name += ", Section ##{index}"
       line = section.line
-      message = section.to_xml
+      message = section
     end
 
-    {:test => name, :line => line.to_i, :message => message}
+    {:test => name, :line => line.to_i, :message => make_report(message, 2)}
   end
 
   def get_results_structure
