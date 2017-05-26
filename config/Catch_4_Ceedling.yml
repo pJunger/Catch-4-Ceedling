@@ -10,9 +10,9 @@
       :*:
         - -lstdc++
 
-:paths:
-  :support:
-    - build/test/main
+# :paths:
+#   :support:
+#     - build/test/main
 
 :tools:
   :test_compiler:

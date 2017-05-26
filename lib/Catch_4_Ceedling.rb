@@ -6,8 +6,8 @@ require 'fileutils'
 
 
 class Catch4_Ceedling < Plugin
-  @@main_dir = "#{PROJECT_ROOT}/build/test/main"
-  @@main_location = "#{@@main_dir}/catch_main.c"
+  @@main_dir = "#{PROJECT_ROOT}/build/test/runners"
+  @@main_location = "#{@@main_dir}/catch_main_runner.c"
   # Get the location of this plugin.
   @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
   
