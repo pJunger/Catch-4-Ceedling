@@ -74,20 +74,18 @@ class Section
     attribute :line, Integer
 
     has_many :Sections, ::Section, :tag => 'Section', :xpath => '.'
-    has_many :Expressions, Expression, :tag => 'Expression' #, :xpath => '.'
+    has_many :Expressions, Expression, :tag => 'Expression'
     has_one :OverallResults, OverallResults, :xpath => '.'
 
     def make_report(indent=0, skipResult=false)
         next_indent = get_next_indent(indent)
         acc = [do_indent(name, indent)]
-        # acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
         acc += @Sections.flat_map {|section| section.make_report(indent, true)}
         unless skipResult
             if @Expressions.empty?
                 acc += ['', do_indent('Results: No Assertions in testcase', indent)]
             else
                 acc += ['', do_indent('Assertions:', next_indent)]
-                # acc.push(do_indent('Assertions:', next_indent))
                 acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
                 acc += @OverallResults.make_report(indent)
             end
@@ -139,7 +137,6 @@ class TestCase
 
     def make_report(indent=0)
         next_indent = get_next_indent(indent)
-        # acc = [do_indent(name, indent)]
         acc = []
         acc += @Sections.flat_map {|section| section.make_report(next_indent, true)}
         acc += ['', do_indent('Assertions:', next_indent)]

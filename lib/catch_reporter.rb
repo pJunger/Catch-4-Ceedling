@@ -1,6 +1,6 @@
-# Monkey patch the original
 require 'xml_parser'
 
+# Monkey patch the original
 class GeneratorHelper
 
     # The only change to the original is the replaced regex match
@@ -12,13 +12,6 @@ class GeneratorHelper
             notice  = "\n" +
                         "ERROR: Test executable \"#{File.basename(executable)}\" failed.\n" +
                         "> Produced no output to $stdout.\n"
-        # elsif ((shell_result[:output] =~ CATCH_XML_STATISTICS_PATTERN).nil?)
-        #     error = true
-        #     # mirror style of generic tool_executor failure output
-        #     notice  = "\n" +
-        #                 "ERROR: Test executable \"#{File.basename(executable)}\" failed.\n" +
-        #                 "> Produced no final test result counts in $stdout:\n" +
-        #                 "#{shell_result[:output].strip}\n"
         end
     
         if (error)
@@ -40,10 +33,6 @@ end
 # Monkey patch the original
 class GeneratorTestResults
   
-  
-
-
-
   def process_and_write_results(unity_shell_result, results_file, test_file)
     output_file   = results_file
     xml_output = unity_shell_result[:output]
@@ -102,8 +91,6 @@ class GeneratorTestResults
     end
 
         
-    # @generator_test_results_sanity_checker.verify(results, unity_shell_result[:exit_code])
-    
     output_file = results_file.ext(@configurator.extension_testfail) if (results[:counts][:failed] > 0)
     
     @yaml_wrapper.dump(output_file, results)
@@ -132,7 +119,6 @@ class GeneratorTestResults
       :failures       => [],
       :ignores        => [],
       :counts         => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
-      # :countsAsserts  => {:total => 0, :passed => 0, :failed => 0, :ignored  => 0},
       :stdout         => [],
       }
   end
@@ -150,8 +136,6 @@ class GeneratorTestResults
       notice += %Q(One or more testcases have already been defined with the same name: "#{match[1]}"\n)
       notice += "Location #1: #{match[2]} @ line #{match[3]}\n"
       notice += "Location #2: #{match[4]} @ line #{match[5]}\n\n"
-      # @ceedling[:streaminator].stderr_puts(notice, Verbosity::COMPLAIN)
-      # @streaminator.stderr_puts(notice, Verbosity::COMPLAIN)
       raise notice
     end
   end
