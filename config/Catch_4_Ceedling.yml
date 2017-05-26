@@ -10,6 +10,10 @@
       :*:
         - -lstdc++
 
+:paths:
+  :support:
+    - test/support
+
 :tools:
   :test_compiler:
     :executable: g++
