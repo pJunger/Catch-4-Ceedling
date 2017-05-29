@@ -26,15 +26,16 @@ class GeneratorTestRunner
 
   def generate(input_file, output_file, tests, used_mocks, testfile_includes)
     # We do not need: input_file, tests, testfile_includes
+
     fff_is_enabled = PLUGINS_ENABLED.include?('fake_function_framework')
     
-    mocks = if fff_is_enabled
-      # only then the mocked functions are exported
-      @@ceedling[:cmock_builder].cmock.get_mocked_functions
-    else
-      {}
-    end
-    template_data = TemplateData.new(fff_is_enabled, mocks, used_mocks)
+    # mocks = if fff_is_enabled
+    #   # only then the mocked functions are exported
+    #   @@ceedling[:cmock_builder].cmock.get_mocked_functions
+    # else
+    #   {}
+    # end
+    template_data = TestRunnerTemplateData.new(fff_is_enabled, used_mocks)
 
 
     # Create the mock_interface implementation
@@ -70,22 +71,16 @@ class GeneratorTestRunner
 
 end
 
-class TemplateData
-  @is_fff_enabled = nil
+class TestRunnerTemplateData
+  @fff_is_enabled = true
   @used_mocks = nil
-  @mocks = nil
-  @used_mock_functions = nil
-  def initialize(is_fff_enabled, mocks, used_mocks)
-    @is_fff_enabled = is_fff_enabled
+  def initialize(fff_is_enabled, used_mocks)
+    @fff_is_enabled = fff_is_enabled
     @used_mocks = used_mocks
-    @mocks = mocks
-    
-    @used_mock_functions = @mocks.select { |k,v| @used_mocks.include?(k) }.flat_map {|k,v| v[:functions]}
   end
 
   def get_binding
     binding
   end
-
 
 end
