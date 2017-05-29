@@ -38,6 +38,22 @@ class Catch4_Ceedling < Plugin
     end
   end
 
+  def pre_runner_generate(arg_hash)
+    GeneratorTestRunner.set_context(@ceedling, @@plugin_root)
+  end
+
+  # def post_runner_generate(arg_hash)
+  #   # After the test runner file has been created, append the FFF globals
+  #   # definition to the end of the test runner. These globals will be shared by
+  #   # all mocks linked into the test.
+  #   File.open(arg_hash[:runner_file], 'a') do |f|
+  #     f.puts
+  #     f.puts "//=======Definitions of FFF variables====="
+  #     f.puts %{#include "fff.h"}
+  #     f.puts "DEFINE_FFF_GLOBALS;"
+  #   end
+  # end
+
 end
 
 # monkey patch

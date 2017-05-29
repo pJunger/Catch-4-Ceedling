@@ -1,0 +1,93 @@
+#include "catch.hpp"
+
+/* Implement the mock interface */
+#include "mock_interface.h"
+/* Get all used mocks */
+<% for mock in @used_mocks %>
+#include "<%=mock%>.h"
+<% end %>
+
+void init_mocks() {
+<% for mock in @used_mocks %>
+  <%=mock%>_Init();
+<% end %>
+}
+
+void destroy_mocks() {
+<% if @fff_is_enabled == true %>
+ <% for mock in @used_mocks %>
+  <%=mock%>_Init();
+ <% end %>
+<% end %>
+}
+
+using uint = unsigned int
+
+struct FakeMagnet {
+    uint call_count;
+<% for fun in @used_mock_functions %>
+    FakeMagnet(const struct <%= fun[:name] %>_Fake& from): call_count(from.call_count) {}
+<% end %>
+}
+
+/* The matcher class */
+class FakeCalledRange : public Catch::MatcherBase<FakeMagnet> {
+    uint m_begin, m_end;
+public:
+    FakeCalledRange( uint begin, uint end ) : m_begin( begin ), m_end( end ) {}
+
+    // Performs the test for this matcher
+    virtual bool match( FakeMagnet const& fake ) const override {
+        return fake.call_count >= m_begin && fake.call_count <= m_end;
+    }
+
+    virtual std::string describe() const {
+        std::ostringstream ss;
+        ss << "is called between " << m_begin << " and " << m_end;
+        return ss.str();
+    }
+};
+
+class FakeCalledTimes : public Catch::MatcherBase<FakeMagnet> {
+    uint m_times;
+public:
+    FakeCalledTimes(uint times): m_times( times ) {}
+
+    // Performs the test for this matcher
+    virtual bool match( FakeMagnet const& fake ) const override {
+        return fake.call_count == m_times;
+    }
+
+    virtual std::string describe() const {
+        std::ostringstream ss;
+        ss << "is called " << m_times << "times";
+        return ss.str();
+    }
+};
+
+// The builder functions
+inline FakeCalledRange IsCalledBetween( uint begin, uint end ) {
+    return FakeCalledRange( begin, end );
+}
+
+inline FakeCalledTimes IsCalled(uint times) {
+    FakeCalledTimes f(times);
+    return f;
+}
+
+
+inline FakeCalledTimes IsCalledOnce() {
+    FakeCalledTimes f(1);
+    return f;
+}
+
+inline FakeCalledTimes IsNotCalled() {
+    FakeCalledTimes f(0);
+    return f;
+}
+
+// Used variables:
+// @is_fff_enabled <%= @is_fff_enabled %>
+// @used_mocks <%= @used_mocks %>
+// @mocks <%= @mocks %>
+// @used_mock_functions <%= @used_mock_functions %>
