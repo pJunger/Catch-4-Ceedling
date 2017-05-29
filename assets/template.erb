@@ -21,20 +21,22 @@ void destroy_mocks() {
 <% end %>
 }
 
-using uint = unsigned int
+<% for fun in @used_mock_functions %>
+struct <%= fun[:name] %>_Fake;
+<% end %>
 
 struct FakeMagnet {
-    uint call_count;
+    unsigned int call_count;
 <% for fun in @used_mock_functions %>
     FakeMagnet(const struct <%= fun[:name] %>_Fake& from): call_count(from.call_count) {}
 <% end %>
-}
+};
 
 /* The matcher class */
-class FakeCalledRange : public Catch::MatcherBase<FakeMagnet> {
-    uint m_begin, m_end;
+struct FakeCalledRange : public Catch::MatcherBase<FakeMagnet> {
+    unsigned int m_begin, m_end;
 public:
-    FakeCalledRange( uint begin, uint end ) : m_begin( begin ), m_end( end ) {}
+    FakeCalledRange( unsigned int begin, unsigned int end ) : m_begin( begin ), m_end( end ) {}
 
     // Performs the test for this matcher
     virtual bool match( FakeMagnet const& fake ) const override {
@@ -48,10 +50,10 @@ public:
     }
 };
 
-class FakeCalledTimes : public Catch::MatcherBase<FakeMagnet> {
-    uint m_times;
+struct FakeCalledTimes : public Catch::MatcherBase<FakeMagnet> {
+    unsigned int m_times;
 public:
-    FakeCalledTimes(uint times): m_times( times ) {}
+    FakeCalledTimes(unsigned int times): m_times( times ) {}
 
     // Performs the test for this matcher
     virtual bool match( FakeMagnet const& fake ) const override {
@@ -66,24 +68,21 @@ public:
 };
 
 // The builder functions
-inline FakeCalledRange IsCalledBetween( uint begin, uint end ) {
-    return FakeCalledRange( begin, end );
+inline FakeCalledRange IsCalledBetween( unsigned int begin, unsigned int end ) {
+    return FakeCalledRange{begin, end};
 }
 
-inline FakeCalledTimes IsCalled(uint times) {
-    FakeCalledTimes f(times);
-    return f;
+inline FakeCalledTimes IsCalled(unsigned int times) {
+    return FakeCalledTimes{times};
 }
 
 
 inline FakeCalledTimes IsCalledOnce() {
-    FakeCalledTimes f(1);
-    return f;
+    return FakeCalledTimes{1};
 }
 
 inline FakeCalledTimes IsNotCalled() {
-    FakeCalledTimes f(0);
-    return f;
+    return FakeCalledTimes{0};
 }
 
 // Used variables:
