@@ -8,19 +8,15 @@ require 'fileutils'
 class Catch4_Ceedling < Plugin
   @@main_dir = "#{PROJECT_ROOT}/build/test/runners"
   @@main_location = "#{@@main_dir}/catch_main_runner.c"
+
   # Get the location of this plugin.
   @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-  
+  # @@main_location = "#{@@plugin_root}/src/catch_main_runner.c"
+
   # Set up Ceedling to use this plugin.
   def setup
-    puts "Using Catch..."
-
-    copy_main()
-
     TestIncludesExtractor.set_main_location(@@main_location)
-    # Switch out the The unity test runner with the catchy thing.
-    # Yeah, did not work as planned, so plan B: Monkey patching :(
-    # @ceedling[:generator_test_runner] = CatchTestRunnerGenerator.new()
+    copy_main()
 
     # Add the path to catch.hpp to the include paths.
     COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@@plugin_root}/vendor/Catch/single_include"
@@ -42,23 +38,13 @@ class Catch4_Ceedling < Plugin
     GeneratorTestRunner.set_context(@ceedling, @@plugin_root)
   end
 
-  # def post_runner_generate(arg_hash)
-  #   # After the test runner file has been created, append the FFF globals
-  #   # definition to the end of the test runner. These globals will be shared by
-  #   # all mocks linked into the test.
-  #   File.open(arg_hash[:runner_file], 'a') do |f|
-  #     f.puts
-  #     f.puts "//=======Definitions of FFF variables====="
-  #     f.puts %{#include "fff.h"}
-  #     f.puts "DEFINE_FFF_GLOBALS;"
-  #   end
-  # end
-
 end
 
 # monkey patch
 class TestIncludesExtractor
   @@main_location = "#{PROJECT_ROOT}/build/test/main/catch_main.c"
+  # @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  # @@main_location = "#{@@plugin_root}/src/catch_main_runner.c"
 
   def self.set_main_location(f_name)
     @@main_location = f_name
