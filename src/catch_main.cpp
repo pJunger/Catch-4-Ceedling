@@ -23,7 +23,7 @@ struct MockListener : Catch::TestEventListenerBase {
         destroy_mocks();
         /* pass_reports(); */
     }    
-    virtual void sectionEnded(Catch::SectionStats const& sectionStats) {
+    virtual void sectionEnded(Catch::SectionStats const&) {
         m_sectionStack.pop_back();
         if (m_sectionStack.size() == 0) {
           destroy_mocks();
