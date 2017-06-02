@@ -11,9 +11,7 @@ class Catch4_Ceedling < Plugin
 
   # Get the location of this plugin.
   @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-  # @@main_location = "#{@@plugin_root}/src/catch_main_runner.c"
 
-  # Set up Ceedling to use this plugin.
   def setup
     TestIncludesExtractor.set_main_location(@@main_location)
     copy_main()
@@ -27,7 +25,6 @@ class Catch4_Ceedling < Plugin
   def copy_main()
     # Optimization: Create extra catch_main file to reduce compilation times
     # Compile only once, it should be invariant
-    # (Otherwise it would take ages to compile)
     unless File.file?(@@main_location)
       FileUtils::mkdir_p(@@main_dir)
       FileUtils.copy_file("#{@@plugin_root}/src/catch_main.cpp", @@main_location)
@@ -42,9 +39,7 @@ end
 
 # monkey patch
 class TestIncludesExtractor
-  @@main_location = "#{PROJECT_ROOT}/build/test/main/catch_main.c"
-  # @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-  # @@main_location = "#{@@plugin_root}/src/catch_main_runner.c"
+  @@main_location = ""
 
   def self.set_main_location(f_name)
     @@main_location = f_name
