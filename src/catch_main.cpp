@@ -49,13 +49,17 @@ int main( int argc, char* argv[] ) {
     const char reporter[] = "-r";
     const char kind[] = "xml";
     const char all_output[] = "-s";
-
-    const int argc_mod = 4;
+    const char duration[] = "-d";
+    const char yes[] = "yes";
+    
+    const int argc_mod = 6;
     const char* argv_mod[argc_mod];
     argv_mod[0] = name;
     argv_mod[1] = reporter;
     argv_mod[2] = kind;
     argv_mod[3] = all_output;
+    argv_mod[4] = duration;
+    argv_mod[5] = yes;
 
     result = Catch::Session().run( argc_mod, argv_mod );
   } else {
