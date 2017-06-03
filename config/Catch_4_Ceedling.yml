@@ -7,15 +7,12 @@
   :test:
     :compile:
       :*:
-        - -std=c++17
+        - -std=c++11
         - -Og
     :linker:
       :*:
         - -lstdc++
 
-# :paths:
-#   :support:
-#     - build/test/main
 
 :tools:
   :test_compiler:
@@ -24,6 +21,8 @@
   :test_linker:
      :executable: g++
      :name: 'GCC Linker'
+     :arguments:
+      - "build/test/out/catch_main.o"
   :test_includes_preprocessor:
     :executable: g++
     :name: gcc_cpp_test_includes_preprocessor
@@ -31,7 +30,7 @@
       - -E
       - -MM
       - -MG
-      - -std=c++17
+      - -std=c++11
       - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
       - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
       - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
@@ -44,7 +43,7 @@
     :name: gcc_cpp_test_file_preprocessor
     :arguments:
       - -E
-      - -std=c++17
+      - -std=c++11
       - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
       - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
       - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
@@ -57,7 +56,7 @@
       - -E
       - -MM
       - -MG
-      - -std=c++17
+      - -std=c++11
       - -I"$": COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR
       - -I"$": COLLECTION_PATHS_TEST_TOOLCHAIN_INCLUDE
       - -D$: COLLECTION_DEFINES_TEST_AND_VENDOR
