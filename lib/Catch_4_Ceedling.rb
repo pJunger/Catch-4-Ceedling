@@ -4,53 +4,45 @@ require 'catch_reporter'
 
 require 'fileutils'
 
-
 class Catch4_Ceedling < Plugin
-  @@main_dir = "#{PROJECT_ROOT}/build/test/runners"
-  @@main_location = "#{@@main_dir}/catch_main_runner.c"
-
   # Get the location of this plugin.
-  @@plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-
+  
   def setup
-    TestIncludesExtractor.set_main_location(@@main_location)
-    copy_main()
+    @plugin_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+    @test_dir = File.join(PROJECT_ROOT, 'build', 'test')
+    @main_dir = File.join(@test_dir, 'runners')
+    @out = File.join(@test_dir, 'out')
+    @out_file = File.join(@out, 'catch_main.o')
+
+    @catch_file = File.join(@plugin_root, 'src', 'catch_main.cpp')
 
     # Add the path to catch.hpp to the include paths.
-    COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@@plugin_root}/vendor/Catch/single_include"
+    COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@plugin_root}/vendor/Catch/single_include"
     # Add the interfaces to includes
-    COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@@plugin_root}/src/"
-  end
-
-  def copy_main()
-    # Optimization: Create extra catch_main file to reduce compilation times
-    # Compile only once, it should be invariant
-    unless File.file?(@@main_location)
-      FileUtils::mkdir_p(@@main_dir)
-      FileUtils.copy_file("#{@@plugin_root}/src/catch_main.cpp", @@main_location)
-    end
+    COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@plugin_root}/src/"
   end
 
   def pre_runner_generate(arg_hash)
-    GeneratorTestRunner.set_context(@ceedling, @@plugin_root)
+    GeneratorTestRunner.set_context(@ceedling, @plugin_root)
+    compile_main()
   end
 
-end
+  def compile_main()
+    # Todo: Replace through proper rake call respectively add as dependency to ceedling (and then remove linker argument from .yml)
+    # Optimization: Create extra catch_main file to reduce compilation times
+    # Compile only once, it should be invariant
 
-# monkey patch
-class TestIncludesExtractor
-  @@main_location = ""
-
-  def self.set_main_location(f_name)
-    @@main_location = f_name
+    unless File.file?(@out_file)
+      FileUtils::mkdir_p(@main_dir)
+      @ceedling[:generator].generate_object_file(
+        TOOLS_TEST_COMPILER,
+        OPERATION_COMPILE_SYM,
+        TEST_SYM,
+        @catch_file,
+        @out_file,
+        @ceedling[:file_path_utils].form_test_build_list_filepath( @out_file ) 
+      )
+    end
   end
 
-  def lookup_includes_list(file)
-    file_key = form_file_key(file)
-
-    includes = [@@main_location]
-
-    return includes if (@includes[file_key]).nil?
-    return includes + @includes[file_key]
-  end
 end
