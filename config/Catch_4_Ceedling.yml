@@ -13,9 +13,6 @@
       :*:
         - -lstdc++
 
-# :paths:
-#   :support:
-#     - build/test/main
 
 :tools:
   :test_compiler:
@@ -24,6 +21,8 @@
   :test_linker:
      :executable: g++
      :name: 'GCC Linker'
+     :arguments:
+      - "build/test/out/catch_main.o"
   :test_includes_preprocessor:
     :executable: g++
     :name: gcc_cpp_test_includes_preprocessor
