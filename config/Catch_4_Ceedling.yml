@@ -1,5 +1,11 @@
 ---
 
+:catch:
+  :color: :no
+
+:cmock:
+  :framework: :catch
+
 :flags:
   :test:
     :compile:

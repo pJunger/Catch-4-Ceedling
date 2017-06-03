@@ -140,7 +140,7 @@ class Section
             acc += ['', do_indent('Assertions:', next_indent)]
             acc += @Failures.flat_map {|failure| failure.make_report(next_indent)}
             acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
-            acc += @OverallResults.make_report(indent)
+            #acc += @OverallResults.make_report(indent)
         end
         acc
     end
@@ -155,6 +155,11 @@ class OverallResult
 
     tag 'OverallResult'
     attribute :success, Boolean
+    attribute :durationInSeconds, Float
+
+    def duration
+        @durationInSeconds
+    end 
 
     def to_passed_failed
         if (@success)
@@ -190,13 +195,18 @@ class TestCase
     has_many :Sections, Section, :tag => 'Section', :xpath => '.'
     has_many :Expressions, Expression, :tag => 'Expression', :xpath => '.'
     has_one :OverallResult, OverallResult, :xpath => '.'
+    has_many :OverallResults, OverallResults
 
     def num_failures
-        @Expressions.select { |exp| not exp.success}.length + @Failures.length
+        @Expressions.select { |exp| not exp.success}.length + @Failures.length + @OverallResults.count{|r| r.failures}
     end
 
     def num_successes
-        @Expressions.select { |exp| exp.success}.length
+        @Expressions.select { |exp| exp.success}.length  + @OverallResults.count{|r| r.successes}
+    end
+
+    def num_ignored
+        @OverallResults.count{|r| r.expectedFailures}
     end
 
     def num_totals
@@ -212,7 +222,8 @@ class TestCase
         acc += ['', do_indent('Assertions:', next_indent)]
         acc += @Failures.flat_map{|failure| failure.make_report(next_indent)}
         acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
-        acc += [do_indent("Results: #{num_successes} passed, #{num_failures} failed, 0 ignored", next_indent)]
+        acc += [do_indent("Results: #{num_successes} passed, #{num_failures} failed, #{num_ignored} ignored", next_indent)]
+        acc += [do_indent("Duration: #{@OverallResult.duration}s", next_indent)]
         acc
     end
 end
