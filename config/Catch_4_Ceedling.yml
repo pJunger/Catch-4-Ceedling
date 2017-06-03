@@ -1,5 +1,8 @@
 ---
 
+:cmock:
+  :framework: :catch
+
 :flags:
   :test:
     :compile:
