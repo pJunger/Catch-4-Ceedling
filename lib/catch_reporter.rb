@@ -100,16 +100,17 @@ class GeneratorTestResults
 
   def create_line_elements(test_case, section=nil, index=nil)
     name = test_case.name
+    message = []
     if (section.nil?)
       line = test_case.line
-      message = test_case
     else
       name += ", Path ##{index + 1}"
       line = section.line
-      message = section
+      message += section.make_report(2)
     end
+    message += test_case.make_report(0)
 
-    {:test => name, :line => line.to_i, :message => make_report(message, 2)}
+    {:test => name, :line => line.to_i, :message => make_string(message)}
   end
 
   def get_results_structure

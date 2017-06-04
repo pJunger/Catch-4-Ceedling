@@ -213,10 +213,23 @@ class TestCase
         @Expressions.length
     end
 
+    # def make_test_report(indent=0)
+    #     next_indent = get_next_indent(indent)
+    #     acc = []
+    #     acc += @Infos.flat_map{|info| info.make_report(next_indent)}
+    #     acc += @Warnings.flat_map{|warning| warning.make_report(next_indent)}
+    #     acc += ['', do_indent('Assertions:', next_indent)]
+    #     acc += @Failures.flat_map{|failure| failure.make_report(next_indent)}
+    #     acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
+    #     acc += [do_indent("Results: #{num_successes} passed, #{num_failures} failed, #{num_ignored} ignored", next_indent)]
+    #     acc += [do_indent("Duration: #{@OverallResult.duration}s", next_indent)]
+    #     acc
+    # end
+
     def make_report(indent=0)
         next_indent = get_next_indent(indent)
         acc = []
-        acc += @Sections.flat_map {|section| section.make_report(next_indent, true)}
+        # acc += @Sections.flat_map {|section| section.make_report(next_indent, true)}
         acc += @Infos.flat_map{|info| info.make_report(next_indent)}
         acc += @Warnings.flat_map{|warning| warning.make_report(next_indent)}
         acc += ['', do_indent('Assertions:', next_indent)]
@@ -289,4 +302,8 @@ end
 
 def make_report(xml_node, indent)
     "\n" + xml_node.make_report(2).join("\n")
+end
+
+def make_string(list)
+    "\n" + list.join("\n")
 end
