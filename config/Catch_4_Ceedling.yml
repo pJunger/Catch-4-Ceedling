@@ -6,7 +6,7 @@
 :flags:
   :test:
     :compile:
-      :*:
+      :'(test|mock)_.+':
         - -std=c++17
         - -Og
     :linker:
