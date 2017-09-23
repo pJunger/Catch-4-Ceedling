@@ -22,11 +22,12 @@ class Catch4_Ceedling < Plugin
     @out_file = File.join(@out, 'catch_main.o')
 
     @catch_file = File.join(@plugin_root, 'src', 'catch_main.cpp')
+    @compile_future = nil
+    
     # Add the path to catch.hpp to the include paths.
     COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@plugin_root}/vendor/Catch/single_include"
     # Add the interfaces to includes
     COLLECTION_PATHS_TEST_SUPPORT_SOURCE_INCLUDE_VENDOR << "#{@plugin_root}/src/"
-    @compile_future = nil
   end
 
   def pre_runner_generate(arg_hash)
