@@ -21,6 +21,7 @@ class OverallResults
     attribute :successes, Integer
     attribute :failures, Integer
     attribute :expectedFailures, Integer
+    attribute :durationInSeconds, Float
 
     def make_report(indent=0)
         acc = [do_indent("Results: #{@successes} passed, #{@failures} failed, #{@expectedFailures} ignored", indent)]
@@ -212,19 +213,6 @@ class TestCase
     def num_totals
         @Expressions.length
     end
-
-    # def make_test_report(indent=0)
-    #     next_indent = get_next_indent(indent)
-    #     acc = []
-    #     acc += @Infos.flat_map{|info| info.make_report(next_indent)}
-    #     acc += @Warnings.flat_map{|warning| warning.make_report(next_indent)}
-    #     acc += ['', do_indent('Assertions:', next_indent)]
-    #     acc += @Failures.flat_map{|failure| failure.make_report(next_indent)}
-    #     acc += @Expressions.flat_map {|expression| expression.make_report(next_indent)}
-    #     acc += [do_indent("Results: #{num_successes} passed, #{num_failures} failed, #{num_ignored} ignored", next_indent)]
-    #     acc += [do_indent("Duration: #{@OverallResult.duration}s", next_indent)]
-    #     acc
-    # end
 
     def make_report(indent=0)
         next_indent = get_next_indent(indent)
