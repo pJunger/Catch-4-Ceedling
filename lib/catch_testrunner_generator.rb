@@ -15,7 +15,14 @@ class GeneratorTestRunner
     raise 'This should no be called?'
   end
 
+  # for older ceedling versions?
   def find_tests(source)
+    # We just fake that, as we do not need to find the tests
+    return []
+  end
+
+  # for new ceedling versions?
+  def find_test_cases(source)
     # We just fake that, as we do not need to find the tests
     return []
   end
