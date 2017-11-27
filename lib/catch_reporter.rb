@@ -35,17 +35,22 @@ class GeneratorTestResults
   
   def process_and_write_results(unity_shell_result, results_file, test_file)
     output_file   = results_file
+    results = get_results_structure
+
     xml_output = unity_shell_result[:output]
 
     check_if_catch_successful(xml_output)
-
-    catch_xml = Catch.parseXmlResult(xml_output)
-
-    results = get_results_structure
-        
+    
     results[:source][:path] = File.dirname(test_file)
     results[:source][:file] = File.basename(test_file)
-    
+      
+
+    begin
+      catch_xml = Catch.parseXmlResult(xml_output)
+    rescue Nokogiri::XML::SyntaxError => exception
+      get_info_before_seg_fault(xml_output)
+    end    
+      
     # process test statistics
     xml_result = catch_xml.OverallResults
     # puts xml_result
@@ -63,7 +68,6 @@ class GeneratorTestResults
         should_it_fail = test_case.tags =~ /\[!shouldfail\]/
         sections = test_case.Sections
         if sections.length == 0
-          # Well, here we really don't have any substantial information
           result = test_case.OverallResult
           if result.success == true
             results[:successes] << create_line_elements(test_case)
@@ -89,12 +93,11 @@ class GeneratorTestResults
         end
       end
     end
-
-        
+    
     output_file = results_file.ext(@configurator.extension_testfail) if (results[:counts][:failed] > 0)
-    
+      
     @yaml_wrapper.dump(output_file, results)
-    
+
     return { :result_file => output_file, :result => results }
   end
 
@@ -110,7 +113,7 @@ class GeneratorTestResults
     end
     message += test_case.make_report(0)
 
-    {:test => name, :line => line.to_i, :message => make_string(message)}
+    {:test => name, :line => line.to_i, :message => make_string(message), :xml => test_case}
   end
 
   def get_results_structure
@@ -128,6 +131,10 @@ class GeneratorTestResults
 
 
   def check_if_catch_successful(output)
+    check_if_multiple_tests_with_same_name(output)
+  end
+
+  def check_if_multiple_tests_with_same_name(output)
     match = output.match(/[\s\S]*?error:\s+TEST_CASE\(\s*"(.*?)"\s*\)\s+already\s+defined.
       \s+First\s+seen\s+at\s+([\w.\/]+):(\d+)
       \s+Redefined\s+at\s+([\w.\/]+):(\d+)/x)
@@ -137,6 +144,34 @@ class GeneratorTestResults
       notice += %Q(One or more testcases have already been defined with the same name: "#{match[1]}"\n)
       notice += "Location #1: #{match[2]} @ line #{match[3]}\n"
       notice += "Location #2: #{match[4]} @ line #{match[5]}\n\n"
+      raise notice
+    end
+  end
+
+  def get_info_before_seg_fault(output)
+    # match = output.match(/(?><(?:(?:\/TestCase)|(?:\/Section)|(?:Group\s+name="[\w\s]+?"))>\s*)
+    #                       (<TestCase.*?>.*?)(?!<\/TestCase|Group|Catch>)$/xs)
+
+    match = output.match(/(?>                           # Atomic group to prevent backtracking explosions
+                            <  (?:                      # Before capturing, one of these must happen
+                                 \/TestCase             # End of a previous testcase
+                                 |  Group\s+name=".+?") # or a group just started
+                            >  \s*) 
+                          (  <TestCase 
+                                      \s+ name="(.*?)"
+                                      \s+ tags=".*?"
+                                      \s+ filename="(.*?)"
+                                      \s+ line="(.*?)">  .*?  )      # Take the unfinished TestCase
+                          (?!  <\/  TestCase  |  Group  |  Catch  >  )$  # and this testcase should not end
+                          /xs)
+
+    if (match)
+      notice = "\nFATAL ERROR:\n"
+      notice += "There has been a segmentation fault in:\n" 
+      notice += "\"#{match[2]}\" @ #{match[3]}:#{match[4]}\n\n"
+      notice += "The remaining output is:\n"
+      notice += match[1]
+      notice += "\n\nStack trace:"
       raise notice
     end
   end
